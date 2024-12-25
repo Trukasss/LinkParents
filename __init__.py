@@ -115,8 +115,10 @@ class OBJECT_OT_make_links_parent(Operator):
         return {"FINISHED"}
 
 
-def add_to_transfer_menu(self, context):
-    self.layout.operator(OBJECT_OT_make_links_parent.bl_idname)
+def add_to_transfer_menu(self: Operator, context):
+    layout = self.layout
+    layout.separator()
+    layout.operator(OBJECT_OT_make_links_parent.bl_idname)
 
 
 def register():
