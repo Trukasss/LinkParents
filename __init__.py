@@ -109,6 +109,7 @@ def register():
         description="Scale from matrix_parent_inverse",
         get=get_parent_inverse_scale,
         set=set_parent_inverse_scale,
+        default=(1, 1, 1),
     )  # type: ignore
 
 
