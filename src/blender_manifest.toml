@@ -1,22 +1,13 @@
 schema_version = "1.0.0"
 
-id = "copy_parents"
+id = "link_parents"
 version = "1.0.0-beta"
-name = "Copy Parents"
-tagline = "Copy objects parents"
+name = "Link Parents"
+tagline = "Link objects parents"
 maintainer = "Lukas Sabaliauskas <lukas_sabaliauskas@hotmail.com>"
 type = "add-on"
-tags = ["Object"]
+tags = ["Object", "Rigging"]
 blender_version_min = "4.2.0"
 license = [
   "SPDX:GPL-3.0-or-later",
 ]
-
-# Optional: build settings.
-# https://docs.blender.org/manual/en/dev/advanced/extensions/command_line_arguments.html#command-line-args-extension-build
-# [build]
-# paths_exclude_pattern = [
-#   "__pycache__/",
-#   "/.git/",
-#   "/*.zip",
-# ]
