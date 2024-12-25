@@ -1,5 +1,5 @@
 import bpy
-from bpy.types import Context, Object
+from bpy.types import Object, Panel, Operator
 from mathutils import Matrix, Vector, Euler
 
 
@@ -62,7 +62,7 @@ def set_parent_inverse_scale(self, value):
     )
 
 
-class OBJECT_PT_MatrixParentInverse(bpy.types.Panel):
+class OBJECT_PT_MatrixParentInverse(Panel):
     """Panel to display matrix_parent_inverse as Location, Rotation, and Scale"""
 
     bl_label = "Matrix Parent Inverse"
@@ -87,22 +87,53 @@ class OBJECT_PT_MatrixParentInverse(bpy.types.Panel):
         col.prop(obj, "parent_inverse_scale")
 
 
+class OBJECT_OT_make_links_parent(Operator):
+    """Replace assigned parent"""
+    bl_idname = "object.make_links_parent"
+    bl_label = "Link Parents"
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object
+
+    def execute(self, context):
+        obj_src = context.active_object
+        if not obj_src:
+            self.report({"ERROR"}, "No active object")
+            return {"CANCELLED"}
+        for obj in context.selected_objects:
+            if obj_src == obj:
+                continue
+            obj.parent = obj_src.parent
+            obj.parent_type = obj_src.parent_type
+            if obj_src.parent_type == "BONE":
+                obj.parent_bone = obj_src.parent_bone
+            elif obj_src.parent_type in ["VERTEX", "VERTEX_3"]:
+                obj.parent_vertices = obj_src.parent_vertices
+            obj.matrix_parent_inverse = obj_src.matrix_parent_inverse
+        return {"FINISHED"}
+
+
+def add_to_transfer_menu(self, context):
+    self.layout.operator(OBJECT_OT_make_links_parent.bl_idname)
+
+
 def register():
-    bpy.utils.register_class(OBJECT_PT_MatrixParentInverse)
     bpy.types.Object.parent_inverse_location = bpy.props.FloatVectorProperty(
         name="Location",
         subtype="TRANSLATION",
         description="Parent inverse location",
         get=get_parent_inverse_location,
         set=set_parent_inverse_location,
-    )  # type: ignore
+    )
     bpy.types.Object.parent_inverse_rotation = bpy.props.FloatVectorProperty(
         name="Rotation",
         subtype="EULER",
         description="Parent inverse rotation (Euler, XYZ)",
         get=get_parent_inverse_rotation,
         set=set_parent_inverse_rotation,
-    )  # type: ignore
+    )
     bpy.types.Object.parent_inverse_scale = bpy.props.FloatVectorProperty(
         name="Scale",
         subtype="XYZ",
@@ -110,10 +141,15 @@ def register():
         get=get_parent_inverse_scale,
         set=set_parent_inverse_scale,
         default=(1, 1, 1),
-    )  # type: ignore
+    )
+    bpy.utils.register_class(OBJECT_PT_MatrixParentInverse)
+    bpy.utils.register_class(OBJECT_OT_make_links_parent)
+    bpy.types.VIEW3D_MT_make_links.append(add_to_transfer_menu)
 
 
 def unregister():
+    bpy.types.VIEW3D_MT_make_links.remove(add_to_transfer_menu)
+    bpy.utils.unregister_class(OBJECT_OT_make_links_parent)
     bpy.utils.unregister_class(OBJECT_PT_MatrixParentInverse)
     del bpy.types.Object.parent_inverse_location
     del bpy.types.Object.parent_inverse_rotation
