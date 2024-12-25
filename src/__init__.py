@@ -103,7 +103,9 @@ class OBJECT_OT_make_links_parent(Operator):
             self.report({"ERROR"}, "No active object")
             return {"CANCELLED"}
         for obj in context.selected_objects:
-            if obj_src == obj:
+            if obj == obj_src:
+                continue
+            if obj == obj_src.parent:
                 continue
             obj.parent = obj_src.parent
             obj.parent_type = obj_src.parent_type
