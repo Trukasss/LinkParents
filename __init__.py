@@ -92,21 +92,21 @@ def register():
     bpy.types.Object.parent_inverse_location = bpy.props.FloatVectorProperty(
         name="Location",
         subtype="TRANSLATION",
-        description="Location  from matrix_parent_inverse",
+        description="Parent inverse location",
         get=get_parent_inverse_location,
         set=set_parent_inverse_location,
     )  # type: ignore
     bpy.types.Object.parent_inverse_rotation = bpy.props.FloatVectorProperty(
         name="Rotation",
         subtype="EULER",
-        description="Rotation (Euler) from matrix_parent_inverse",
+        description="Parent inverse rotation (Euler, XYZ)",
         get=get_parent_inverse_rotation,
         set=set_parent_inverse_rotation,
     )  # type: ignore
     bpy.types.Object.parent_inverse_scale = bpy.props.FloatVectorProperty(
         name="Scale",
         subtype="XYZ",
-        description="Scale from matrix_parent_inverse",
+        description="Parent inverse scale",
         get=get_parent_inverse_scale,
         set=set_parent_inverse_scale,
         default=(1, 1, 1),
