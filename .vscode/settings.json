@@ -1,0 +1,6 @@
+{
+    "python.autoComplete.extraPaths": [
+     "C://Users//Lukas//Documents//Python//blender_autocomplete//4.2",
+     "C://Program Files//Blender Foundation//Blender 4.2//4.2//scripts//modules",
+    ]
+}
