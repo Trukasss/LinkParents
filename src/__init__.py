@@ -120,7 +120,7 @@ class OBJECT_OT_make_links_parent(Operator):
 def add_to_transfer_menu(self: Operator, context):
     layout = self.layout
     layout.separator()
-    layout.operator(OBJECT_OT_make_links_parent.bl_idname)
+    layout.operator(OBJECT_OT_make_links_parent.bl_idname, icon="ORIENTATION_PARENT")
 
 
 def register():
