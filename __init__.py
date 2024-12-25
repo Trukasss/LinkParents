@@ -3,8 +3,68 @@ from bpy.types import Context, Object
 from mathutils import Matrix, Vector, Euler
 
 
+def get_parent_inverse_location(self):
+    obj = bpy.context.object
+    matrix: Matrix = obj.matrix_parent_inverse
+    return matrix.to_translation()
+
+
+def get_parent_inverse_rotation(self):
+    obj = bpy.context.object
+    matrix: Matrix = obj.matrix_parent_inverse
+    return matrix.to_euler()
+
+
+def get_parent_inverse_scale(self):
+    obj = bpy.context.object
+    matrix: Matrix = obj.matrix_parent_inverse
+    return matrix.to_scale()
+
+
+def set_parent_inverse_matrix(obj: Object, loc: Vector, rot: Euler, scale: Vector):
+    obj.matrix_parent_inverse = (
+        Matrix.Translation(loc)
+        @ rot.to_matrix().to_4x4()
+        @ Matrix.Diagonal(scale).to_4x4()
+    )
+
+
+def set_parent_inverse_location(self, value):
+    obj = bpy.context.object
+    matrix: Matrix = obj.matrix_parent_inverse
+    set_parent_inverse_matrix(
+        obj=obj, 
+        loc=Vector(value), 
+        rot=matrix.to_euler(), 
+        scale=matrix.to_scale()
+    )
+
+
+def set_parent_inverse_rotation(self, value):
+    obj = bpy.context.object
+    matrix: Matrix = obj.matrix_parent_inverse
+    set_parent_inverse_matrix(
+        obj=obj,
+        loc=matrix.to_translation(),
+        rot=Euler(value),
+        scale=matrix.to_scale(),
+    )
+
+
+def set_parent_inverse_scale(self, value):
+    obj = bpy.context.object
+    matrix: Matrix = obj.matrix_parent_inverse
+    set_parent_inverse_matrix(
+        obj=obj,
+        loc=matrix.to_translation(),
+        rot=matrix.to_euler(),
+        scale=Vector(value),
+    )
+
+
 class OBJECT_PT_MatrixParentInverse(bpy.types.Panel):
     """Panel to display matrix_parent_inverse as Location, Rotation, and Scale"""
+
     bl_label = "Matrix Parent Inverse"
     bl_idname = "OBJECT_PT_matrix_parent_inverse"
     bl_space_type = "PROPERTIES"
@@ -12,7 +72,6 @@ class OBJECT_PT_MatrixParentInverse(bpy.types.Panel):
     bl_context = "object"
     bl_parent_id = "OBJECT_PT_relations"
     bl_options = {"DEFAULT_CLOSED"}
-
 
     @classmethod
     def poll(cls, context):
@@ -28,49 +87,29 @@ class OBJECT_PT_MatrixParentInverse(bpy.types.Panel):
         col.prop(obj, "parent_inverse_scale")
 
 
-def update_matrix_parent_inverse_props(obj):
-    matrix = obj.matrix_parent_inverse
-    obj.parent_inverse_location = matrix.to_translation()
-    obj.parent_inverse_rotation = matrix.to_euler()
-    obj.parent_inverse_scale = matrix.to_scale()
-
-
-def update_matrix_parent_inverse(self, context: Context):
-    obj = context.object
-    if not obj:
-        return
-    loc = Vector(obj.parent_inverse_location)
-    rot = Euler(obj.parent_inverse_rotation)
-    scale = Vector(obj.parent_inverse_scale)
-    obj.matrix_parent_inverse = (
-        Matrix.Translation(loc) @ rot.to_matrix().to_4x4() @ Matrix.Diagonal(scale).to_4x4()
-    )
-
 def register():
     bpy.utils.register_class(OBJECT_PT_MatrixParentInverse)
     bpy.types.Object.parent_inverse_location = bpy.props.FloatVectorProperty(
         name="Location",
-        subtype='TRANSLATION',
+        subtype="TRANSLATION",
         description="Location  from matrix_parent_inverse",
-        update=update_matrix_parent_inverse,
-    )
+        get=get_parent_inverse_location,
+        set=set_parent_inverse_location,
+    )  # type: ignore
     bpy.types.Object.parent_inverse_rotation = bpy.props.FloatVectorProperty(
         name="Rotation",
-        subtype='EULER',
+        subtype="EULER",
         description="Rotation (Euler) from matrix_parent_inverse",
-        update=update_matrix_parent_inverse,
-    )
+        get=get_parent_inverse_rotation,
+        set=set_parent_inverse_rotation,
+    )  # type: ignore
     bpy.types.Object.parent_inverse_scale = bpy.props.FloatVectorProperty(
         name="Scale",
-        subtype='XYZ',
+        subtype="XYZ",
         description="Scale from matrix_parent_inverse",
-        update=update_matrix_parent_inverse,
-    )
-
-    # # Initialize the properties for existing objects
-    # for obj in bpy.data.objects:
-    #     if hasattr(obj, "matrix_parent_inverse"):
-    #         update_matrix_parent_inverse_props(obj)
+        get=get_parent_inverse_scale,
+        set=set_parent_inverse_scale,
+    )  # type: ignore
 
 
 def unregister():
