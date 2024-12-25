@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "copy_parents"
-version = "1.0.0-alpha"
+version = "1.0.0-beta"
 name = "Copy Parents"
 tagline = "Copy objects parents"
 maintainer = "Lukas Sabaliauskas <lukas_sabaliauskas@hotmail.com>"
