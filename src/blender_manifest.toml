@@ -1,9 +1,9 @@
 schema_version = "1.0.0"
 
 id = "link_parents"
-version = "1.0.0-beta"
+version = "1.0.1-beta"
 name = "Link Parents"
-tagline = "Link objects parents"
+tagline = "Link objects parents and edit Parent Inverse Matrix under Relations panel."
 maintainer = "Lukas Sabaliauskas <lukas_sabaliauskas@hotmail.com>"
 type = "add-on"
 tags = ["Object", "Rigging", "User Interface"]
