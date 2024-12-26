@@ -6,7 +6,7 @@ name = "Link Parents"
 tagline = "Link objects parents"
 maintainer = "Lukas Sabaliauskas <lukas_sabaliauskas@hotmail.com>"
 type = "add-on"
-tags = ["Object", "Rigging"]
+tags = ["Object", "Rigging", "User Interface"]
 blender_version_min = "4.2.0"
 license = [
   "SPDX:GPL-3.0-or-later",
