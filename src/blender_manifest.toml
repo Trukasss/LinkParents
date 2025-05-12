@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "link_parents"
-version = "1.0.1-beta"
+version = "1.1.0-beta"
 name = "Link Parents"
 tagline = "Link objects parents & edit Parent Inverse Matrix in UI"
 maintainer = "Lukas Sabaliauskas <lukas_sabaliauskas@hotmail.com>"
