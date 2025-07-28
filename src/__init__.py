@@ -200,6 +200,102 @@ class OBJECT_OT_paste_matrix_parent_inverse(Operator):
         self.report({"INFO"}, "Matrix Parent Inverse pasted")
         return {"FINISHED"}
 
+
+## --- Constraints inverse matrix copy/paste
+
+class BONE_OT_copy_constraint_inverse_matrix(Operator):
+    """Copy active constraint matrix inverse from active bone to clipboard"""
+    bl_idname = "bone.copy_constraint_inverse_matrix"
+    bl_label = "Copy Bone Constraint matrix inverse"
+    bl_options = {"REGISTER", "INTERNAL"}
+
+    constraint_index : bpy.props.IntProperty() # type: ignore
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_pose_bone
+
+    def execute(self, context):
+        target_constraint = None
+        for i, constraint in enumerate(context.active_pose_bone.constraints):
+            if i == self.constraint_index:
+                target_constraint = constraint
+                break
+        if target_constraint is None:
+            self.report({"ERROR"}, "No constraint found")
+            return {"CANCELLED"}
+
+        matrix_list = [v[:] for v in target_constraint.inverse_matrix]
+        matrix_clip = json.dumps(matrix_list)
+        bpy.context.window_manager.clipboard = matrix_clip
+        self.report({"INFO"}, "Constraint matrix inverse copied to clipboard")
+        return {"FINISHED"}
+
+class BONE_OT_paste_constraint_inverse_matrix(Operator):
+    """Paste active constraint matrix inverse to active bone from clipboard"""
+    bl_idname = "bone.paste_constraint_inverse_matrix"
+    bl_label = "Paste Bone Constraint matrix inverse"
+    bl_options = {"REGISTER", "INTERNAL"}
+
+    constraint_index : bpy.props.IntProperty() # type: ignore
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_pose_bone
+
+    def execute(self, context):
+        target_constraint = None
+        for i, constraint in enumerate(context.active_pose_bone.constraints):
+            if i == self.constraint_index:
+                target_constraint = constraint
+                break
+        if target_constraint is None:
+            self.report({"ERROR"}, "No constraint found")
+            return {"CANCELLED"}
+
+        try:
+            matrix_clip = json.loads(bpy.context.window_manager.clipboard)
+            target_constraint.inverse_matrix = Matrix(matrix_clip)
+        except Exception as e:
+            self.report({"ERROR"}, f"Invalid clipboard:\n{e}")
+            return {"CANCELLED"}
+
+        self.report({"INFO"}, "Constraint matrix inverse pasted")
+        return {"FINISHED"}
+
+class BONE_PT_ConstraintMatrixParentInverse(Panel):
+    """Panel to copy/paste constraint's matrix_parent_inverse"""
+
+    bl_label = "Child Of Matrix Parent Inverse"
+    bl_idname = "OBJECT_PT_constraint_inverse_matrix"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "bone_constraint"
+    bl_options = {"DEFAULT_CLOSED"}
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_pose_bone and any(constraint.type == 'CHILD_OF'
+                        for constraint in context.active_pose_bone.constraints
+        )
+
+    def draw(self, context):
+        if not context.active_pose_bone:
+            return
+        pose_bone = context.active_pose_bone
+        layout = self.layout
+        layout.use_property_split = True
+
+        for i, constraint in enumerate(pose_bone.constraints):
+            if constraint.type != 'CHILD_OF':
+                continue
+            row = layout.row()
+            row.label(text=f"{constraint.name}", icon="CONSTRAINT")
+            subrow = row.row(align=True)
+            subrow.operator('bone.copy_constraint_inverse_matrix', text="", icon="COPYDOWN").constraint_index = i
+            subrow.operator('bone.paste_constraint_inverse_matrix', text="", icon="PASTEDOWN").constraint_index = i
+
+
 def add_to_transfer_menu(self: Operator, context):
     layout = self.layout
     layout.separator()
