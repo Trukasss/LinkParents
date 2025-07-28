@@ -13,7 +13,7 @@ This addon also finally exposes the obscure __Matrix Parent Inverse__ under the 
 ### 3. BONE CONSTRAINT
 Finally, it allows you to copy-paste "Child of" bone constraint's inverse matrix from one bone to another. Thanks to [Pullusb](https://github.com/Pullusb).
 
-![Matrix Parent Inverse Constraint](/presentation/Matrix_parent_inverse_contraint.png)
+![Matrix Parent Inverse Constraint](/presentation/Matrix_parent_inverse_constraint.png)
 
 
 You can report any bug or file a feature request here: https://github.com/Trukasss/LinkParents/issues
