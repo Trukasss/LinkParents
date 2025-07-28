@@ -2,7 +2,7 @@ bl_info = {
     "name": "Link Parents",
     "description": "Link objects parents & edit Parent Inverse Matrix in UI",
     "author": "Lukas Sabaliauskas <lukas_sabaliauskas@hotmail.com>",
-    "version": (1, 1, 0),
+    "version": (1, 2, 0),
     "blender": (4, 0, 0),
     "location": "Object Properties > Relations > Matrix Parent Inverse",
     "warning": "",
@@ -12,6 +12,8 @@ bl_info = {
 }
 
 import bpy
+import json
+
 from bpy.types import Object, Panel, Operator, PropertyGroup
 from mathutils import Matrix, Vector, Euler
 
@@ -171,7 +173,6 @@ class OBJECT_OT_copy_matrix_parent_inverse(Operator):
         return context.active_object
 
     def execute(self, context):
-        import json
         matrix_list = [v[:] for v in context.active_object.matrix_parent_inverse]
         matrix_clip = json.dumps(matrix_list)
         bpy.context.window_manager.clipboard = matrix_clip
@@ -189,7 +190,6 @@ class OBJECT_OT_paste_matrix_parent_inverse(Operator):
         return context.active_object
 
     def execute(self, context):
-        import json
         try:
             matrix_clip = json.loads(bpy.context.window_manager.clipboard)
             context.object.matrix_parent_inverse = Matrix(matrix_clip)
@@ -308,15 +308,21 @@ def register():
     bpy.utils.register_class(OBJECT_OT_make_links_parent)
     bpy.utils.register_class(OBJECT_OT_copy_matrix_parent_inverse)
     bpy.utils.register_class(OBJECT_OT_paste_matrix_parent_inverse)
+    bpy.utils.register_class(BONE_OT_copy_constraint_inverse_matrix)
+    bpy.utils.register_class(BONE_OT_paste_constraint_inverse_matrix)
     bpy.utils.register_class(OBJECT_PT_MatrixParentInverse)
+    bpy.utils.register_class(BONE_PT_ConstraintMatrixParentInverse)
     bpy.types.VIEW3D_MT_make_links.append(add_to_transfer_menu)
 
 
 def unregister():
     bpy.types.VIEW3D_MT_make_links.remove(add_to_transfer_menu)
+    bpy.utils.unregister_class(BONE_PT_ConstraintMatrixParentInverse)
     bpy.utils.unregister_class(OBJECT_PT_MatrixParentInverse)
     bpy.utils.unregister_class(OBJECT_OT_paste_matrix_parent_inverse)
     bpy.utils.unregister_class(OBJECT_OT_copy_matrix_parent_inverse)
+    bpy.utils.unregister_class(BONE_OT_paste_constraint_inverse_matrix)
+    bpy.utils.unregister_class(BONE_OT_copy_constraint_inverse_matrix)
     bpy.utils.unregister_class(OBJECT_OT_make_links_parent)
     del bpy.types.Object.transform_parent_inverse
     bpy.utils.unregister_class(TransformParentInverse)
