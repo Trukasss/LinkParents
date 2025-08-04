@@ -2,7 +2,7 @@ bl_info = {
     "name": "Link Parents",
     "description": "Link objects parents & edit Parent Inverse Matrix in UI",
     "author": "Lukas Sabaliauskas <lukas_sabaliauskas@hotmail.com>",
-    "version": (1, 2, 0),
+    "version": (1, 2, 1),
     "blender": (4, 0, 0),
     "location": "Object Properties > Relations > Matrix Parent Inverse",
     "warning": "",
@@ -13,25 +13,26 @@ bl_info = {
 
 import bpy
 import json
+from typing import Literal
 
 from bpy.types import Object, Panel, Operator, PropertyGroup
 from mathutils import Matrix, Vector, Euler
 
 
-def get_parent_inverse_location(self):
-    obj = bpy.context.object
+def get_parent_inverse_location(self: "TransformParentInverse"):
+    obj = self.id_data
     matrix: Matrix = obj.matrix_parent_inverse
     return matrix.to_translation()
 
 
-def get_parent_inverse_rotation(self):
-    obj = bpy.context.object
+def get_parent_inverse_rotation(self: "TransformParentInverse"):
+    obj = self.id_data
     matrix: Matrix = obj.matrix_parent_inverse
     return matrix.to_euler()
 
 
-def get_parent_inverse_scale(self):
-    obj = bpy.context.object
+def get_parent_inverse_scale(self: "TransformParentInverse"):
+    obj = self.id_data
     matrix: Matrix = obj.matrix_parent_inverse
     return matrix.to_scale()
 
@@ -44,8 +45,8 @@ def set_parent_inverse_matrix(obj: Object, loc: Vector, rot: Euler, scale: Vecto
     )
 
 
-def set_parent_inverse_location(self, value):
-    obj = bpy.context.object
+def set_parent_inverse_location(self: "TransformParentInverse", value):
+    obj = self.id_data
     matrix: Matrix = obj.matrix_parent_inverse
     set_parent_inverse_matrix(
         obj=obj, 
@@ -55,8 +56,8 @@ def set_parent_inverse_location(self, value):
     )
 
 
-def set_parent_inverse_rotation(self, value):
-    obj = bpy.context.object
+def set_parent_inverse_rotation(self: "TransformParentInverse", value):
+    obj = self.id_data
     matrix: Matrix = obj.matrix_parent_inverse
     set_parent_inverse_matrix(
         obj=obj,
@@ -66,8 +67,8 @@ def set_parent_inverse_rotation(self, value):
     )
 
 
-def set_parent_inverse_scale(self, value):
-    obj = bpy.context.object
+def set_parent_inverse_scale(self: "TransformParentInverse", value):
+    obj = self.id_data
     matrix: Matrix = obj.matrix_parent_inverse
     set_parent_inverse_matrix(
         obj=obj,
@@ -75,6 +76,7 @@ def set_parent_inverse_scale(self, value):
         rot=matrix.to_euler(),
         scale=Vector(value),
     )
+
 
 class TransformParentInverse(PropertyGroup):
     location: bpy.props.FloatVectorProperty(
@@ -231,6 +233,7 @@ class BONE_OT_copy_constraint_inverse_matrix(Operator):
         self.report({"INFO"}, "Constraint matrix inverse copied to clipboard")
         return {"FINISHED"}
 
+
 class BONE_OT_paste_constraint_inverse_matrix(Operator):
     """Paste active constraint matrix inverse to active bone from clipboard"""
     bl_idname = "bone.paste_constraint_inverse_matrix"
@@ -262,6 +265,7 @@ class BONE_OT_paste_constraint_inverse_matrix(Operator):
 
         self.report({"INFO"}, "Constraint matrix inverse pasted")
         return {"FINISHED"}
+
 
 class BONE_PT_ConstraintMatrixParentInverse(Panel):
     """Panel to copy/paste constraint's matrix_parent_inverse"""
